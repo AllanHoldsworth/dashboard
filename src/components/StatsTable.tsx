@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { statsMock } from '../mock/stats';
 import clsx from 'clsx';
 import { calculateDiff, formatNumber } from '../utils/formatters';
@@ -12,6 +12,23 @@ const StatsTable = () => {
   const handleRowClick = (id: string) => {
     setActiveRowId(prev => prev === id ? null : id);
   }
+
+  useEffect(() => {
+    if (activeRowId) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`chart-row-${activeRowId}`);
+
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+          });
+        }
+      }, 310);
+
+      return () => clearTimeout(timer);
+    }
+  }, [activeRowId]);
 
   const baseCellClasses = "p-4 border-b-4 border-white last:border-r-0 border-r-4 transition-colors";
 
@@ -80,6 +97,7 @@ const StatsTable = () => {
                       <AnimatePresence>
                         {isActive && (
                           <motion.div
+                            id={`chart-row-${row.id}`}
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
